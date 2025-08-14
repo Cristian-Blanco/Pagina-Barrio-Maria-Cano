@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <!-- Codificación de caracteres -->
+  <meta charset="utf-8" />
+  <!-- Escala y adaptación a móviles -->
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- Título de la pestaña del navegador -->
+  <title>Barrio María Cano – Bogotá D.C.</title>
+  <!-- Hoja de estilos externa para separar presentación de estructura -->
+  <link rel="stylesheet" href="src/css/styles.css" />
+</head>
+<body>
+  <!-- ==================== FILA 1: Encabezado con logo + título ==================== -->
+  <header class="topbar">
+    <!-- Contenedor que alinea logo y título en una sola fila y los centra -->
+    <div class="logo-title">
+      <!-- Logo del barrio: atributo alt para accesibilidad y loading lazy para optimizar -->
+      <img
+        src="https://uploads.knightlab.com/storymapjs/7f1f7a40dec75712842017c6dcdce290/ruta-de-maria-cano/_images/mariacano.png"
+        alt="Logo Barrio María Cano"
+        class="logo"
+        loading="lazy"
+      />
+      <!-- Título principal del sitio -->
+      <h1 class="title">Barrio María Cano – Bogotá D.C. – Colombia</h1>
+    </div>
+  </header>
+
+  <!-- ==================== FILA 2: Navegación principal ==================== -->
+  <!-- role="navigation" y aria-label mejoran accesibilidad para lectores de pantalla -->
+  <nav class="navgrid" role="navigation" aria-label="Navegación principal">
+    <!-- ========== Menú desplegable: Equipamiento ========== -->
+    <!-- .dropdown posiciona el submenú y .dropbtn es el botón que abre/cierra -->
+    <div class="navitem dropdown">
+      <!-- aria-haspopup/expanded informan del estado del menú al lector de pantalla -->
+      <button class="dropbtn" aria-haspopup="true" aria-expanded="false">
+        Equipamiento <span class="caret" aria-hidden="true">▾</span>
+      </button>
+      <!-- Submenú con enlaces a páginas de cada equipamiento -->
+      <ul class="dropdown-menu" role="menu" aria-label="Submenú de Equipamiento">
+        <!-- Cada <a> apunta a una página distinta (a crear por separado) -->
+        <li role="none"><a role="menuitem" href="ubicacion.html">Ubicación</a></li>
+        <li role="none"><a role="menuitem" href="movilidad.html">Movilidad</a></li>
+        <li role="none"><a role="menuitem" href="troncales.html">Troncales</a></li>
+        <li role="none"><a role="menuitem" href="parques.html">Parques</a></li>
+        <li role="none"><a role="menuitem" href="vias.html">Vías</a></li>
+        <li role="none"><a role="menuitem" href="catastro3d.html">Catastros 3D</a></li>
+        <li role="none"><a role="menuitem" href="recorrido-virtual.html">Recorrido Virtual</a></li>
+      </ul>
+    </div>
+
+    <!-- Otros enlaces de navegación simples.. -->
+    <a class="navitem" href="problemas.html" title="Ir a Problemas">Problemas</a>
+    <!-- Enlace con logo a la derecha para "Acerca de" -->
+    <a class="navitem acerca" href="acerca.html" title="Ir a Acerca de">
+      Acerca de
+      <img
+        src="https://previews.123rf.com/images/valentint/valentint1704/valentint170400665/75401422-about-us-icon-about-us-website-button-on-white-background.jpg"
+        alt="Logo Acerca de"
+        class="acerca-logo"
+        loading="lazy"
+      />
+    </a>
+  </nav>
+    <!-- ==================== FILA 3: Imagen de fondo con texto ==================== -->
+    <section class="hero">
+      <h2 class="hero-text">María Cano</h2>
+    </section>
+
+    <!-- ==================== FILA 4: Pie de página ==================== -->
+    <footer class="footer">
+      <p>Todos los derechos reservados</p>
+    </footer>
+  <!-- Carga del JavaScript al final con defer para no bloquear el render -->
+  <script src="src/js/programa.js" defer></script>
+</body>
+</html>
