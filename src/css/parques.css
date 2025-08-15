@@ -1,0 +1,54 @@
+/* ====== PARQUES (página) ====== */
+/* Layout a pantalla completa: 80% mapa / 20% panel */
+.parques-layout{
+    width:100vw;
+    /* Si tu header+nav cambian de alto, ajusta esta resta */
+    height:calc(100vh - 120px);
+    display:grid;
+    grid-template-columns: 4fr 1fr; /* 80 / 20 */
+  }
+  
+  #map{
+    height:100%;
+    width:100%;
+  }
+  
+  /* Panel derecho */
+  #panel{
+    border-left: 1px solid rgba(255,255,255,.15); /* leve, respeta temas oscuros */
+    background: transparent;                      /* deja ver tu color de fondo */
+    overflow:auto;
+  }
+  
+  .panel-inner{ padding:14px; }
+  
+  .p-title{ margin:0 0 6px; font-size:1.05rem; }
+  .muted{ opacity:.85; }
+  
+  .badges{
+    display:flex; gap:6px; flex-wrap:wrap; margin:6px 0 10px;
+  }
+  .badge{
+    display:inline-block; padding:2px 8px; border-radius:999px;
+    border:1px solid rgba(255,255,255,.25);
+    background: rgba(0,0,0,.1); font-size:.8rem;
+  }
+  
+  /* Imagen de parque (si existe) */
+  .park-img{
+    width:100%; height:auto; border-radius:10px;
+    border:1px solid rgba(255,255,255,.15); margin:10px 0;
+  }
+  
+  /* Tooltip Leaflet un poquito más legible */
+  .leaflet-tooltip{ font-size:12px; padding:4px 6px; }
+  
+  /* Responsive */
+  @media (max-width: 900px){
+    .parques-layout{
+      grid-template-columns:1fr;
+      grid-template-rows:54vh 46vh;
+      height:auto;
+    }
+    #panel{ border-left:none; border-top:1px solid rgba(255,255,255,.15); }
+  }
