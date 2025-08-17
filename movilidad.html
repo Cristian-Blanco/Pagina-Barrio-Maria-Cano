@@ -123,8 +123,9 @@
     }).addTo(map);
 
     const layerRutasAll = L.geoJSON(null, {
-      style: () => ({ color: cssVar("--baseRoute") || "#7e8aa3", weight: 2 })
+    style: () => ({ color: "#800080", weight: 2 })
     }).addTo(map);
+
 
     const clusterParaderosAll = L.markerClusterGroup({ disableClusteringAtZoom: 17 });
 
