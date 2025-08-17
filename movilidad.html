@@ -4,7 +4,7 @@
   <!-- Metadatos -->
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Barrio María Cano – Bogotá D.C.</title>
+  <title>Movilidad – SITP en Barrio María Cano (Bogotá D.C.)</title>
 
   <!-- Estilos propios -->
   <link rel="stylesheet" href="src/css/styles_movilidad.css" />
@@ -13,7 +13,7 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
   <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-  <!-- MarkerCluster (para paraderos, opcional) -->
+  <!-- MarkerCluster (para paraderos/estaciones) -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"/>
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css"/>
   <script defer src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
@@ -22,7 +22,7 @@
   <script defer src="https://unpkg.com/@turf/turf@6.5.0/turf.min.js"></script>
 </head>
 <body class="movilidad">
-  <!-- ==================== FILA 1: Encabezado con logo + título ==================== -->
+  <!-- ==================== FILA 1: Encabezado ==================== -->
   <header class="topbar">
     <div class="logo-title">
       <img
@@ -31,11 +31,11 @@
         class="logo"
         loading="lazy"
       />
-      <h1 class="title">Barrio María Cano – Bogotá D.C. – Colombia</h1>
+      <h1 class="title">SITP – Barrio María Cano · Bogotá D.C.</h1>
     </div>
   </header>
 
-  <!-- ==================== FILA 2: Navegación principal ==================== -->
+  <!-- ==================== FILA 2: Navegación ==================== -->
   <nav class="navgrid" role="navigation" aria-label="Navegación principal">
     <div class="navitem dropdown">
       <button class="dropbtn" aria-haspopup="true" aria-expanded="false">
@@ -43,7 +43,7 @@
       </button>
       <ul class="dropdown-menu" role="menu" aria-label="Submenú de Equipamiento">
         <li role="none"><a role="menuitem" href="ubicacion.html">Ubicación</a></li>
-        <li role="none"><a role="menuitem" href="movilidad.html">Movilidad</a></li>
+        <li role="none"><a role="menuitem" href="movilidad.html" aria-current="page">Movilidad</a></li>
         <li role="none"><a role="menuitem" href="troncales.html">Troncales</a></li>
         <li role="none"><a role="menuitem" href="parques.html">Parques</a></li>
         <li role="none"><a role="menuitem" href="vias.html">Vías</a></li>
@@ -74,12 +74,16 @@
         <span class="pill">Datos: <code>.geojson</code></span>
       </div>
 
+      <div class="msg">
+        Esta página visualiza las rutas del SITP en Bogotá y resalta aquellas que se intersectan con el barrio <b>María Cano</b>. Si hay rutas o paraderos dentro del barrio, se listan aquí; de lo contrario, verás el mensaje correspondiente.
+      </div>
+
       <div id="resumen" class="msg">Cargando capas…</div>
 
       <div class="legend">
         <div class="chip"><span class="swatch sw-barrio"></span> Barrio María Cano</div>
         <div class="chip"><span class="swatch sw-base-route"></span> Rutas SITP (todas)</div>
-        <div class="chip"><span class="swatch sw-base-stop"></span> Paraderos SITP (todos)</div>
+        <div class="chip"><span class="swatch sw-base-stop"></span> Paraderos/Estaciones SITP (todos)</div>
         <div class="chip"><span class="swatch sw-hit"></span> Elementos dentro del barrio</div>
       </div>
 
@@ -94,12 +98,12 @@
   <!-- ==================== JS ==================== -->
   <script>
   document.addEventListener('DOMContentLoaded', () => {
-    // ----------- Rutas de datos locales -----------
+    // ----------- Rutas de datos locales (ajusta nombres si difieren) -----------
     const SRC = "src/assets/";
     const FILES = {
-      barrios   : SRC + "barrios.geojson",
-      rutasSITP : SRC + "Lineas_Estaciones_SITP.geojson",
-      paraderos : SRC + "paraderos_zonalesSITP.geojson"
+      barrios    : SRC + "barrios.geojson",
+      rutasSITP  : SRC + "Lineas_Estaciones_SITP.geojson",      // líneas SITP (LineString/MultiLineString) con cod_linea, nom_ruta, orig_ruta, dest_ruta
+      paraderos  : SRC + "paraderos_zonalesSITP.geojson"        // puntos de paraderos/estaciones
     };
 
     // ----------- Utilidades -----------
@@ -108,78 +112,143 @@
       const n = String(name||"")
         .normalize("NFD").replace(/[\u0300-\u036f]/g,"")
         .replace(/\s+/g," ").trim().toLowerCase();
-      return n.includes("maria cano"); // tolera variantes
+      return n.includes("maria cano"); // tolera variantes de escritura
     };
 
-    // ----------- Mapa -----------
+    // ----------- Mapa base -----------
     const map = L.map("map", { zoomControl: true });
     const osm = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
       maxZoom: 20, attribution: "&copy; OpenStreetMap"
     }).addTo(map);
 
-    // Capas base
+    // Ícono tipo bus para estaciones/paraderos (sin depender de imágenes externas)
+    const busIcon = L.divIcon({
+      className: "bus-icon",
+      html: '<div class="bus-pin" aria-hidden="true">🚌</div>',
+      iconSize: [28, 28],
+      iconAnchor: [14, 28],
+      popupAnchor: [0, -28]
+    });
+
+    // Capas
     const layerBarrio = L.geoJSON(null, {
       style: { color: cssVar("--accent2") || "#FF7043", weight: 2.5, fillOpacity: 0.08 }
     }).addTo(map);
 
+    // RUTAS (todas) en morado; se agregan tooltips de líneas vía onEachFeature
     const layerRutasAll = L.geoJSON(null, {
-    style: () => ({ color: "#800080", weight: 2 })
+      style: () => ({ color: cssVar("--baseRoute") || "#3e085e", weight: 2 }),
+      onEachFeature: (f, l) => {
+        const p = f.properties || {};
+        const cod = p.cod_linea || p.COD_LINEA || p.codigo || "";
+        const nom = p.nom_ruta  || p.NOM_RUTA  || p.nombre || p.NOMBRE || "Ruta SITP";
+        const ori = p.orig_ruta || p.ORIG_RUTA || p.origen || "";
+        const des = p.dest_ruta || p.DEST_RUTA || p.destino || "";
+        const tip = `
+          <div class="tip">
+            <b>${nom}${cod ? " ("+cod+")" : ""}</b><br/>
+            <small>Origen:</small> ${ori || "—"}<br/>
+            <small>Destino:</small> ${des || "—"}
+          </div>
+        `;
+        l.bindTooltip(tip, { sticky:true, direction:"top", opacity:0.95 });
+
+        // resaltado en hover
+        l.on("mouseover", () => l.setStyle({ weight: 5, opacity: 1 }));
+        l.on("mouseout",  () => l.setStyle({ weight: 2, opacity: 1 }));
+      }
     }).addTo(map);
 
-
+    // Clúster de estaciones/paraderos (todos)
     const clusterParaderosAll = L.markerClusterGroup({ disableClusteringAtZoom: 17 });
 
-    // Capas destacadas (intersección)
+    // Capa de estaciones/paraderos con icono bus y tooltip en hover
+    const layerParaderosAll = L.geoJSON(null, {
+      pointToLayer: (f, latlng) => L.marker(latlng, { icon: busIcon }),
+      onEachFeature: (f, l) => {
+        const p  = f.properties || {};
+        const nom = p.nombre || p.NOMBRE || p.name || "Estación/Paradero";
+        const via = p.via    || p.VIA    || p.calle || p.CALLE || "";
+        const dir = p.direccion_bandera || p.DIRECCION_BANDERA || p.dir_bandera || "";
+        const tip = `
+          <div class="tip">
+            <b>${nom}</b><br/>
+            <small>Vía:</small> ${via || "—"}<br/>
+            <small>Dirección bandera:</small> ${dir || "—"}
+          </div>
+        `;
+        l.bindTooltip(tip, { sticky:true, direction:"top", opacity:0.95 });
+        l.on("mouseover", () => l.getElement()?.classList.add("hover"));
+        l.on("mouseout",  () => l.getElement()?.classList.remove("hover"));
+      }
+    });
+
+    // Añadir cada marcador al cluster
+    layerParaderosAll.on("layeradd", (e) => {
+      if (e.layer && e.layer.getLatLng) clusterParaderosAll.addLayer(e.layer);
+    });
+
+    // Capas destacadas (intersección con el barrio)
     const layerRutasHit = L.geoJSON(null, {
-      style: { color: cssVar("--accent") || "#4FC3F7", weight: 3.5 }
+      style: { color: cssVar("--accent") || "#4FC3F7", weight: 3.5 },
+      onEachFeature: (f, l) => {
+        const p = f.properties || {};
+        const cod = p.cod_linea || p.COD_LINEA || p.codigo || "";
+        const nom = p.nom_ruta  || p.NOM_RUTA  || p.nombre || p.NOMBRE || "Ruta SITP";
+        const ori = p.orig_ruta || p.ORIG_RUTA || p.origen || "";
+        const des = p.dest_ruta || p.DEST_RUTA || p.destino || "";
+        const tip = `
+          <div class="tip">
+            <b>${nom}${cod ? " ("+cod+")" : ""}</b><br/>
+            <small>Origen:</small> ${ori || "—"}<br/>
+            <small>Destino:</small> ${des || "—"}
+          </div>
+        `;
+        l.bindTooltip(tip, { sticky:true, direction:"top", opacity:0.95 });
+        l.on("mouseover", () => l.setStyle({ weight: 5 }));
+        l.on("mouseout",  () => l.setStyle({ weight: 3.5 }));
+      }
     });
+
     const layerParaderosHit = L.geoJSON(null, {
-      pointToLayer: (_, latlng) => L.circleMarker(latlng, {
-        radius: 6, weight: 2, color: "#0b1220",
-        fillColor: cssVar("--accent") || "#4FC3F7", fillOpacity: 0.95
-      })
+      pointToLayer: (f, latlng) => L.marker(latlng, { icon: busIcon }),
+      onEachFeature: (f, l) => {
+        const p  = f.properties || {};
+        const nom = p.nombre || p.NOMBRE || p.name || "Estación/Paradero";
+        const via = p.via    || p.VIA    || p.calle || p.CALLE || "";
+        const dir = p.direccion_bandera || p.DIRECCION_BANDERA || p.dir_bandera || "";
+        const tip = `
+          <div class="tip">
+            <b>${nom}</b><br/>
+            <small>Vía:</small> ${via || "—"}<br/>
+            <small>Dirección bandera:</small> ${dir || "—"}
+          </div>
+        `;
+        l.bindTooltip(tip, { sticky:true, direction:"top", opacity:0.95 });
+      }
     });
 
-    // Popups
-    function popupRuta(f, l){
-      const p = f.properties || {};
-      const nombre = p.NOMBRE || p.name || p.route || "Ruta SITP";
-      l.bindPopup(`<b>Ruta SITP</b><br>${nombre}`);
-    }
-    function popupParadero(f, l){
-      const p = f.properties || {};
-      const cod = p.CODIGO || p.codigo || p.code || "";
-      const nom = p.NOMBRE || p.nombre || p.name || "Paradero";
-      l.bindPopup(`<b>Paradero SITP</b><br>${nom}${cod ? "<br><small>"+cod+"</small>" : ""}`);
-    }
-
-    // ----------- Carga y lógica -----------
+    // ----------- Carga y lógica principal -----------
     Promise.all([
       fetch(FILES.barrios).then(r=> r.ok ? r.json() : Promise.reject(new Error("No se pudo leer barrios.geojson"))),
       fetch(FILES.rutasSITP).then(r=> r.ok ? r.json() : Promise.reject(new Error("No se pudo leer Lineas_Estaciones_SITP.geojson"))),
       fetch(FILES.paraderos).then(r=> r.ok ? r.json() : Promise.reject(new Error("No se pudo leer paraderos_zonalesSITP.geojson")))
     ]).then(([barrios, rutas, paraderos]) => {
-      // 1) Encontrar María Cano por 'barriocomu'
+      // 1) Encontrar María Cano por varias claves posibles
       const featsBarrio = (barrios.features || []).filter(f => {
         const props = f.properties || {};
         const name = props.barriocomu || props.BARRIO || props.Nombre || props.NOMBRE || props.name;
         return isMariaCano(name);
       });
 
-      if(!featsBarrio.length){
+      if (!featsBarrio.length) {
         document.getElementById("resumen").innerHTML =
           `<span class="error">No se encontró el polígono del barrio “María Cano”.</span><br>
-           Verifica que <code>barrios.geojson</code> tenga la propiedad <code>barriocomu</code> con ese valor.`;
-        map.setView([4.711, -74.072], 11); // Bogotá
-        // Muestra totales como referencia
-        layerRutasAll.addData(rutas).eachLayer((l)=> popupRuta(l.feature, l));
-        L.geoJSON(paraderos, {
-          pointToLayer: (_, latlng) => L.circleMarker(latlng, {
-            radius: 4, weight:1.5, color:"#0b1220",
-            fillColor: cssVar("--baseStops") || "#b0c4de", fillOpacity:0.9
-          }),
-          onEachFeature: popupParadero
-        }).eachLayer(m=>clusterParaderosAll.addLayer(m));
+           Verifica que <code>barrios.geojson</code> tenga la propiedad <code>barriocomu</code> (o similar) con ese valor.`;
+        map.setView([4.711, -74.072], 11); // Bogotá como referencia
+        // Mostrar totales de referencia
+        layerRutasAll.addData(rutas);
+        layerParaderosAll.addData(paraderos);
         map.addLayer(clusterParaderosAll);
         return;
       }
@@ -192,17 +261,11 @@
       map.fitBounds([[bbox[1], bbox[0]], [bbox[3], bbox[2]]], { padding:[20,20] });
 
       // 2) Pintar totales
-      layerRutasAll.addData(rutas).eachLayer((l)=> popupRuta(l.feature, l));
-      L.geoJSON(paraderos, {
-        pointToLayer: (_, latlng) => L.circleMarker(latlng, {
-          radius: 4, weight:1.5, color:"#0b1220",
-          fillColor: cssVar("--baseStops") || "#b0c4de", fillOpacity:0.9
-        }),
-        onEachFeature: popupParadero
-      }).eachLayer(m=>clusterParaderosAll.addLayer(m));
+      layerRutasAll.addData(rutas);
+      layerParaderosAll.addData(paraderos);
       map.addLayer(clusterParaderosAll);
 
-      // 3) Intersecciones (SITP)
+      // 3) Intersecciones
       const rutasHits = (rutas.features || []).filter(f => {
         try { return f.geometry && turf.booleanIntersects(f, barrio); }
         catch(e) { return false; }
@@ -215,11 +278,8 @@
         paraderosHits = dentro.features || [];
       } catch(e) { paraderosHits = []; }
 
-      // Pintar capas destacadas
-      layerRutasHit.addData({ type:"FeatureCollection", features: rutasHits })
-                   .eachLayer((l)=> popupRuta(l.feature, l));
-      layerParaderosHit.addData({ type:"FeatureCollection", features: paraderosHits })
-                        .eachLayer((l)=> popupParadero(l.feature, l));
+      layerRutasHit.addData({ type:"FeatureCollection", features: rutasHits });
+      layerParaderosHit.addData({ type:"FeatureCollection", features: paraderosHits });
 
       // 4) Panel resumen
       const rN = rutas.features?.length ?? 0;
@@ -228,11 +288,11 @@
       const pH = paraderosHits.length;
 
       const resumen = document.getElementById("resumen");
-      if(rH===0 && pH===0){
+      if (rH===0 && pH===0){
         resumen.innerHTML =
-          `<div class="warn">El barrio no cuenta con estaciones ni rutas SITP.</div>
+          `<div class="warn">El barrio María Cano no cuenta con rutas ni paraderos del SITP.</div>
            <div class="msg">Se muestran <span class="count">${rN}</span> rutas y <span class="count">${pN}</span> paraderos totales como referencia.</div>`;
-      }else{
+      } else {
         resumen.innerHTML =
           `<div>Intersecciones encontradas:</div>
            <ul class="list">

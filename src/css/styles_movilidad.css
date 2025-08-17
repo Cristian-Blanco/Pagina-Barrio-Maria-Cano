@@ -5,9 +5,9 @@
   --text:#e9eef7;
   --muted:#9fb0ca;
 
-  --accent:#4FC3F7;    /* elementos dentro del barrio */
+  --accent:#4FC3F7;    /* elementos dentro del barrio (hits) */
   --accent2:#FF7043;   /* contorno barrio */
-  --baseRoute:#3e085e; /* rutas totales */
+  --baseRoute:#3e085e; /* rutas totales (morado) */
   --baseStops:#b0c4de; /* paraderos totales */
 }
 
@@ -22,81 +22,45 @@ body.movilidad{
 
 /* =================== FILA 1: Encabezado =================== */
 body.movilidad .topbar{
-  display:flex;                   /* Centrado total */
-  justify-content:center;
-  align-items:center;
-  width:100%;
-  background-color:#0f2d11;       /* color solicitado */
-  border-bottom:3px solid #1b5e20;
-  padding:16px 24px;
-  box-sizing:border-box;
+  display:flex; justify-content:center; align-items:center; width:100%;
+  background-color:#0f2d11; border-bottom:3px solid #1b5e20; padding:16px 24px;
 }
-body.movilidad .logo-title{
-  display:flex; align-items:center; justify-content:center;
-  gap:14px; max-width:1280px; width:100%; margin:0 auto;
-}
+body.movilidad .logo-title{ display:flex; align-items:center; justify-content:center; gap:14px; max-width:1280px; width:100%; margin:0 auto; }
 body.movilidad .logo{ height:90px; width:auto; }
-body.movilidad .title{
-  font-size:1.8rem; color:#fff; margin:0; text-align:center;
-}
+body.movilidad .title{ font-size:1.8rem; color:#fff; margin:0; text-align:center; }
 
-/* =================== FILA 2: Navegación principal =================== */
+/* =================== FILA 2: Navegación =================== */
 body.movilidad .navgrid{
-  display:flex; justify-content:center; align-items:stretch;
-  flex-wrap:wrap;                 /* evita desborde en móvil */
-  gap:20px;
-  background-color:#1b5e20;       /* verde oscuro banda */
-  padding:12px; width:100%; box-sizing:border-box;
+  display:flex; justify-content:center; align-items:stretch; flex-wrap:wrap; gap:20px;
+  background-color:#1b5e20; padding:12px; width:100%;
 }
-body.movilidad .navitem{
-  color:#fff; text-decoration:none;
-  padding:8px 10px; border-radius:10px; border:1px solid transparent;
-}
-body.movilidad .navitem:hover{
-  background:rgba(255,255,255,.08);
-  border-color:rgba(255,255,255,.18);
-}
-body.movilidad .acerca{ margin-left:0; display:flex; align-items:center; gap:8px; }
+body.movilidad .navitem{ color:#fff; text-decoration:none; padding:8px 10px; border-radius:10px; border:1px solid transparent; }
+body.movilidad .navitem:hover{ background:rgba(255,255,255,.08); border-color:rgba(255,255,255,.18); }
+body.movilidad .acerca{ display:flex; align-items:center; gap:8px; }
 body.movilidad .acerca-logo{ width:20px; height:20px; border-radius:50%; }
 
-/* ===== Dropdown (mismo verde que la barra) ===== */
+/* Dropdown accesible controlado por JS */
 body.movilidad .navgrid .dropdown{ position:relative; }
 body.movilidad .navgrid .dropbtn{
-  background:transparent;         /* igual que otros items */
-  color:#fff;
-  border:1px solid transparent;
+  background:transparent; color:#fff; border:1px solid transparent;
   padding:8px 12px; border-radius:10px; cursor:pointer;
 }
-body.movilidad .navgrid .dropbtn:hover,
-body.movilidad .navgrid .dropdown.open .dropbtn,
-body.movilidad .navgrid .dropbtn:focus{
-  background:rgba(255,255,255,.08);
-  border-color:rgba(255,255,255,.18);
-  outline:none;
-}
+body.movilidad .navgrid .dropbtn:focus{ outline:2px solid var(--accent); outline-offset:2px; }
 body.movilidad .navgrid .dropdown-menu{
   position:absolute; top:100%; left:0; min-width:220px;
-  background:#1b5e20;            /* verde de la barra */
-  border:1px solid #134718;
-  border-radius:12px;
+  background:#1b5e20; border:1px solid #134718; border-radius:12px;
   box-shadow:0 10px 30px rgba(0,0,0,.25);
   padding:6px; margin-top:6px; list-style:none; display:none; z-index:1000;
 }
-body.movilidad .navgrid .dropdown.open .dropdown-menu,
-body.movilidad .navgrid .dropdown:hover .dropdown-menu{ display:block; }
-body.movilidad .navgrid .dropdown-menu a{
-  display:block; color:#fff; text-decoration:none;
-  padding:8px 10px; border-radius:8px;
-}
-body.movilidad .navgrid .dropdown-menu a:hover{
-  background:#246b27;            /* verde un poco más claro */
-}
+body.movilidad .navgrid .dropdown.open .dropdown-menu{ display:block; }
+body.movilidad .navgrid .dropdown-menu a{ display:block; color:#fff; text-decoration:none; padding:8px 10px; border-radius:8px; }
+body.movilidad .navgrid .dropdown-menu a:hover{ background:#246b27; }
 
 /* =================== Layout principal (Mapa + Panel) =================== */
 body.movilidad .layout{
   display:grid;
   grid-template-columns: 1fr 360px;
-  grid-auto-rows: minmax(300px, calc(100vh - 160px)); /* altura vista aprox */
+  grid-auto-rows: minmax(300px, calc(100vh - 160px));
 }
 #map{ width:100%; height:100%; min-height:420px; }
 
@@ -107,10 +71,7 @@ body.movilidad .layout{
   padding:14px; overflow:auto; color:var(--text);
 }
 .panel-header{ display:flex; align-items:center; gap:8px; margin-bottom:6px; }
-.pill{
-  display:inline-block; padding:4px 8px; border:1px solid #2a3957;
-  border-radius:999px; color:var(--muted); font-size:12px;
-}
+.pill{ display:inline-block; padding:4px 8px; border:1px solid #2a3957; border-radius:999px; color:var(--muted); font-size:12px; }
 
 /* Leyenda y chips */
 .legend{ margin-top:10px; font-size:13px; line-height:1.6; }
@@ -140,6 +101,29 @@ body.movilidad .layout{
 .warn{ color:#ffb74d; }
 .error{ color:#ef5350; }
 .list{ padding-left:18px; margin:8px 0; }
+
+/* =================== Ícono tipo bus (DivIcon) =================== */
+.bus-icon .bus-pin{
+  background:#ffffff;
+  border:2px solid #0b1220;
+  border-radius:50%;
+  width:28px; height:28px;
+  line-height:24px; text-align:center;
+  font-size:16px; user-select:none;
+  box-shadow:0 4px 10px rgba(0,0,0,.35);
+  transform-origin:center bottom;
+  transition:transform .15s ease;
+}
+.leaflet-marker-icon.bus-icon.hover .bus-pin,
+.leaflet-marker-icon.bus-icon:hover .bus-pin{
+  transform:scale(1.12);
+}
+
+/* =================== Tooltip refinado =================== */
+.leaflet-tooltip .tip{
+  font-size:12.5px; line-height:1.25;
+}
+.leaflet-tooltip b{ font-size:13px; }
 
 /* =================== Responsive =================== */
 @media (max-width: 900px){
