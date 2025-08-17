@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Parques – Barrio María Cano</title>
+
+  <!-- CSS global del sitio -->
+  <link rel="stylesheet" href="src/css/styles.css" />
+
+  <!-- Leaflet -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+
+  <!-- CSS específico de esta página -->
+  <link rel="stylesheet" href="src/css/parques.css" />
+</head>
+<body>
+  <!-- ==================== FILA 1: Encabezado con logo + título ==================== -->
+  <header class="topbar">
+    <div class="logo-title">
+      <img
+        src="https://uploads.knightlab.com/storymapjs/7f1f7a40dec75712842017c6dcdce290/ruta-de-maria-cano/_images/mariacano.png"
+        alt="Logo Barrio María Cano"
+        class="logo"
+        loading="lazy"
+      />
+      <h1 class="title">Barrio María Cano – Bogotá D.C. – Colombia - Parques</h1>
+    </div>
+  </header>
+
+  <!-- ==================== FILA 2: Navegación principal ==================== -->
+  <nav class="navgrid" role="navigation" aria-label="Navegación principal">
+    <div class="navitem dropdown">
+      <button class="dropbtn" aria-haspopup="true" aria-expanded="false">
+        Equipamiento <span class="caret" aria-hidden="true">▾</span>
+      </button>
+      <ul class="dropdown-menu" role="menu" aria-label="Submenú de Equipamiento">
+        <li role="none"><a role="menuitem" href="ubicacion.html">Ubicación</a></li>
+        <li role="none"><a role="menuitem" href="movilidad.html">Movilidad</a></li>
+        <li role="none"><a role="menuitem" href="troncales.html">Troncales</a></li>
+        <li role="none"><a role="menuitem" href="parques.html">Parques</a></li>
+        <li role="none"><a role="menuitem" href="vias.html">Vías</a></li>
+        <li role="none"><a role="menuitem" href="catastro3d.html">Catastros 3D</a></li>
+        <li role="none"><a role="menuitem" href="recorrido-virtual.html">Recorrido Virtual</a></li>
+      </ul>
+    </div>
+    <a class="navitem" href="problemas.html" title="Ir a Problemas">Problemas</a>
+    <a class="navitem acerca" href="acerca.html" title="Ir a Acerca de">
+      Acerca de
+      <img
+        src="https://previews.123rf.com/images/valentint/valentint1704/valentint170400665/75401422-about-us-icon-about-us-website-button-on-white-background.jpg"
+        alt="Logo Acerca de"
+        class="acerca-logo"
+        loading="lazy"
+      />
+    </a>
+  </nav>
+
+  <!-- ==================== FILA 3: Mapa (80%) + Panel (20%) ==================== -->
+  <main class="parques-layout">
+    <div id="map" aria-label="Mapa del barrio con parques"></div>
+
+    <aside id="panel" aria-live="polite">
+      <div class="panel-inner">
+        <h2 class="p-title">Parques del barrio</h2>
+        <p class="muted" id="hint">Pasa el mouse o toca un parque para ver los detalles aquí.</p>
+        <div id="details" class="muted">Sin selección.</div>
+      </div>
+    </aside>
+  </main>
+
+  <!-- JS -->
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="src/js/parques.js" defer></script>
+</body>
+</html>
