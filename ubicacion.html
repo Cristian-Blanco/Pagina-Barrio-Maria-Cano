@@ -20,6 +20,30 @@
       margin: 20px auto;
       border-radius: 12px; 
     }
+
+     /* ==================== Estilos para el título y párrafo ==================== */
+  .map-description {
+    max-width: 1200px;          /* ancho máximo del contenido */
+    margin: 30px auto;          /* centrado vertical y horizontal */
+    padding: 10px;              /* espacio interior */
+    text-align: center;         /* para el título */
+    background-color: #f9f9f9; /* fondo suave para destacar */
+    border-radius: 12px;        /* bordes redondeados */
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1); /* sombra elegante */
+  }
+
+  .map-description h2 {
+    margin-bottom: 20px;
+    font-size: 1.3m;
+    color: #0d0d0e;             /* combina con el polígono */
+  }
+
+  .map-description p {
+    text-align: justify;        /* párrafo justificado */
+    font-size: 0.8em;
+    line-height: 1.2;
+    color: #333;
+  }
   </style>
 </head>
 <body>
@@ -66,11 +90,17 @@
   </nav>
 
   <!-- ==================== Contenido principal ==================== -->
-  <main class="contenido">
-    <h2>Mapa del Barrio María Cano</h2>
-    <p>El Barrio María Cano está en Ciudad Bolívar, al sur de Bogotá. Aquí su ubicación aproximada:</p>
-    <div id="map"></div>
-  </main>
+ <main class="contenido">
+  <div class="map-description">
+    <h2>Ubicación del Barrio María Cano</h2>
+    <p>El barrio María Cano está ubicado en la localidad de Ciudad Bolívar, 
+        al sur de Bogotá, limitando aproximadamente al norte con la Avenida Ciudad de Cali, 
+        al sur con sectores residenciales de la zona alta de la localidad, 
+        al oriente con el barrio San Francisco y al occidente con zonas verdes 
+        y otras urbanizaciones de Ciudad Bolívar</p>
+  </div>
+  <div id="map"></div>
+</main>
 
   <!-- ==================== Pie de página ==================== -->
   <footer class="footer">
