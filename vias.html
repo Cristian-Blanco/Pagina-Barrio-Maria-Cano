@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>VÍAS – Barrio María Cano (Bogotá D.C.)</title>
+
+   <!-- 2) Overrides específicos de Vías -->
+  <link rel="stylesheet" href="src/css/styles_vias.css" />
+
+  <!-- Leaflet -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""
+  />
+  <script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""
+  ></script>
+
+  <!-- Turf.js (geometría/bearings/intersecciones) -->
+  <script src="https://unpkg.com/@turf/turf@6.5.0/turf.min.js"></script>
+</head>
+
+<body class="vias">
+  <!-- =================== FILA 1 =================== -->
+  <header class="topbar">
+    <div class="logo-title">
+      <img
+        src="https://uploads.knightlab.com/storymapjs/7f1f7a40dec75712842017c6dcdce290/ruta-de-maria-cano/_images/mariacano.png"
+        alt="Logo Barrio María Cano"
+        class="logo"
+        loading="lazy"
+      />
+      <h1 class="title">VÍAS – Barrio María Cano</h1>
+    </div>
+  </header>
+
+  <!-- ==================== FILA 2: Navegación ==================== -->
+  <nav class="navgrid" role="navigation" aria-label="Navegación principal">
+    <div class="navitem dropdown">
+      <button class="dropbtn" aria-haspopup="true" aria-expanded="false">
+        Equipamiento <span class="caret" aria-hidden="true">▾</span>
+      </button>
+      <ul class="dropdown-menu" role="menu" aria-label="Submenú de Equipamiento">
+        <li role="none"><a role="menuitem" href="ubicacion.html">Ubicación</a></li>
+        <li role="none"><a role="menuitem" href="movilidad.html">Movilidad</a></li>
+        <li role="none"><a role="menuitem" href="troncales.html" aria-current="page">Troncales</a></li>
+        <li role="none"><a role="menuitem" href="parques.html">Parques</a></li>
+        <li role="none"><a role="menuitem" href="vias.html">Vías</a></li>
+        <li role="none"><a role="menuitem" href="catastro3d.html">Catastros 3D</a></li>
+        <li role="none"><a role="menuitem" href="recorrido-virtual.html">Recorrido Virtual</a></li>
+      </ul>
+    </div>
+
+    <a class="navitem" href="problemas.html" title="Ir a Problemas">Problemas</a>
+    <a class="navitem acerca" href="acerca.html" title="Ir a Acerca de">
+      Acerca de
+      <img
+        src="https://previews.123rf.com/images/valentint/valentint1704/valentint170400665/75401422-about-us-icon-about-us-website-button-on-white-background.jpg"
+        alt="Logo Acerca de"
+        class="acerca-logo"
+        loading="lazy"
+      />
+    </a>
+  </nav>
+
+  <!-- =================== MAPA + PALETA DERECHA =================== -->
+  <section class="layout">
+    <div id="map" role="region" aria-label="Mapa de vías en María Cano"></div>
+
+    <aside id="panel" aria-label="Paleta derecha">
+      <div class="panel-header">
+        <strong>Paleta Vías</strong>
+        <span class="pill">María Cano</span>
+      </div>
+
+      <!-- Solo contador -->
+      <div class="msg msg-compact">
+        Vías dentro del barrio: <span class="count ok" id="nDentro">–</span>
+      </div>
+
+      <!-- Convenciones (mismas clases .legend/.chip/.swatch) -->
+      <div class="legend">
+        <div class="chip"><span class="swatch sw-base-route"></span>Vías (verde)</div>
+        <div class="chip"><span class="swatch sw-hit"></span>Intersecciones</div>
+        <div class="chip"><span class="swatch sw-barrio"></span>Límite barrio</div>
+      </div>
+    </aside>
+  </section>
+
+  <script>
+    // ===== Dropdown accesible (mismas convenciones) =====
+  const drop = document.querySelector('.dropdown');
+  const btn  = document.getElementById('capasBtn');
+  const menu = document.getElementById('capasMenu');
+
+  if (drop && btn && menu) {
+    btn.addEventListener('click', () => {
+      const open = drop.classList.toggle('open');
+      btn.setAttribute('aria-expanded', String(open));
+    });
+    document.addEventListener('click', (e) => {
+      if (!drop.contains(e.target)) { drop.classList.remove('open'); btn.setAttribute('aria-expanded','false'); }
+    });
+  }
+
+    // ===== Mapa =====
+    const map = L.map('map', { minZoom: 11, maxZoom: 19 }).setView([4.676, -74.09], 14);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap'
+    }).addTo(map);
+
+    // Colores desde CSS: --baseRoute (verde), --accent2 (barrio)
+    const cssVar = (name, fallback) => {
+      const v = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+      return v || fallback;
+    };
+    const colorVias   = cssVar('--baseRoute', '#2ecc71');
+    const colorBarrio = cssVar('--accent2',   '#FF7043');
+
+    const capaBarrio = L.geoJSON(null, {
+      style: { color: colorBarrio, weight: 3, fillColor: colorBarrio, fillOpacity: .15 }
+    }).addTo(map);
+
+    const capaVias = L.geoJSON(null, {
+      style: { color: colorVias, weight: 3, opacity: .95 }
+    }).addTo(map);
+
+    const capaCruces = L.geoJSON(null, { pointToLayer: (f, latlng) => {
+      // Marcador como estrella negra (misma paleta)
+      return L.marker(latlng, {
+        icon: L.divIcon({ className: 'star-pt', html: '★', iconSize: [20,20], iconAnchor: [10,10] })
+      });
+    }}).addTo(map);
+
+    const nDentro = document.getElementById('nDentro');
+
+    // ===== Utilidades =====
+    const normalize = (s) => (s||'').toString().normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase();
+    const esMariaCano = (t) => normalize(t).includes('MARIA CANO');
+
+    function nombreVia(props = {}) {
+      const keys = ['NAME','Name','name','NOMBRE','Nombre','via','VIA','CALLE','CARRERA','Tramo','TRAMO'];
+      for (const k of keys) if (props[k]) return props[k];
+      return 'Vía sin nombre';
+    }
+
+    // Dirección respecto al norte (0–360) + punto cardinal
+    function azimutDeLinea(geom){
+      // Tomar primer y último vértice de la geometría
+      let coords = [];
+      if (geom.type === 'LineString') coords = geom.coordinates;
+      else if (geom.type === 'MultiLineString') coords = geom.coordinates[0] || [];
+      if (coords.length < 2) return {deg: NaN, card: '?'};
+
+      const a = turf.point(coords[0]);
+      const b = turf.point(coords[coords.length-1]);
+      let deg = turf.bearing(a, b);     // -180..180 (0 = norte)
+      deg = (deg + 360) % 360;          // 0..360
+
+      const card = cardinal(deg);
+      return {deg, card};
+    }
+
+    function cardinal(deg){
+      const dirs = ['N','NE','E','SE','S','SW','W','NW','N'];
+      return dirs[Math.round(deg/45)];
+    }
+
+    function fmtDeg(d){ return (Math.round(d*10)/10).toFixed(1) + '°'; }
+    function fmtLatLng(ll){
+      return `Lat: ${ll.lat.toFixed(6)}<br>Lon: ${ll.lng.toFixed(6)}`;
+    }
+
+    // Cargar BARRIO y centrar
+    fetch('src/assets/barrios.geojson').then(r=>r.json()).then(g=>{
+      let featureMC = null;
+      (g.features||[]).some(f=>{
+        const p = f.properties||{};
+        const candidatos = [p.NOMBRE,p.Nombre,p.nombre,p.BARRIO,p.Barrio,p.barrio,p.NOM_BARRIO,p.nom_barrio,p.name];
+        if (candidatos.some(t=>t && esMariaCano(t))){ featureMC=f; return true; }
+        return false;
+      });
+      if (!featureMC && (g.features||[]).length===1) featureMC=g.features[0];
+      if (!featureMC){ alert('No se encontró el barrio "María Cano" en barrios.geojson'); return; }
+
+      capaBarrio.addData(featureMC);
+      map.fitBounds(capaBarrio.getBounds(), { padding:[20,20] });
+
+      cargarVias(featureMC);
+    }).catch(()=>alert('No fue posible cargar barrios.geojson. Verifica la ruta y usa un servidor local.'));
+    
+    // Cargar VÍAS, filtrar por intersección con barrio, dibujar, contar e identificar cruces
+    function cargarVias(barrio){
+      fetch('src/assets/Vias.geojson').then(r=>r.json()).then(g=>{
+        const todas = (g.features||[]).filter(f => f && f.geometry && (f.geometry.type==='LineString' || f.geometry.type==='MultiLineString'));
+
+        // Filtrar las que intersectan el barrio
+        const dentro = [];
+        for (const f of todas){
+          try{
+            if (turf.booleanIntersects(f, barrio)) dentro.push(f);
+          }catch(e){/* ignore */ }
+        }
+
+        // Dibujar y tooltips (NAME + dirección)
+        capaVias.clearLayers();
+        dentro.forEach(f=>{
+          const {deg, card} = azimutDeLinea(f.geometry||{});
+          const nombre = nombreVia(f.properties);
+          const tooltip = `<b>${escapeHtml(nombre)}</b><br>Dirección: ${isFinite(deg)?fmtDeg(deg)+' ('+card+')':'N/D'}`;
+
+          const l = L.geoJSON(f, { style:{ color: colorVias, weight:3, opacity:.95 }});
+          l.eachLayer(layer=>{
+            layer.bindTooltip(tooltip, {sticky:true});
+            layer.on('mouseover',()=>layer.setStyle({weight:6}));
+            layer.on('mouseout', ()=>layer.setStyle({weight:3}));
+          });
+          l.addTo(capaVias);
+        });
+
+        // Contador
+        nDentro.textContent = dentro.length;
+
+        // ===== Intersecciones entre líneas (dentro del barrio) =====
+        const pts = [];
+        for (let i=0;i<dentro.length;i++){
+          for (let j=i+1;j<dentro.length;j++){
+            try{
+              const inter = turf.lineIntersect(dentro[i], dentro[j]);
+              inter.features.forEach(p=>{
+                if (turf.booleanPointInPolygon(p, barrio)) pts.push(p);
+              });
+            }catch(e){/* ignore */}
+          }
+        }
+        // Quitar duplicados (redondeo a 6 decimales)
+        const seen = new Set();
+        const uniq = [];
+        for (const p of pts){
+          const [x,y] = p.geometry.coordinates;
+          const key = `${x.toFixed(6)},${y.toFixed(6)}`;
+          if (!seen.has(key)){ seen.add(key); uniq.push(p); }
+        }
+
+        // Dibujar cruces (estrella) + tooltip lat/lon
+        capaCruces.clearLayers();
+        uniq.forEach(p=>{
+          const [lon, lat] = p.geometry.coordinates;
+          const m = L.marker([lat, lon], {
+            icon: L.divIcon({ className:'star-pt', html:'★', iconSize:[20,20], iconAnchor:[10,10] })
+          }).bindTooltip(fmtLatLng({lat, lng:lon}), {sticky:true});
+          m.addTo(capaCruces);
+        });
+
+        // Toggle desde Fila 2
+        document.getElementById('toggleCruces').onclick = (e)=>{ e.preventDefault(); if(map.hasLayer(capaCruces)) map.removeLayer(capaCruces); else capaCruces.addTo(map); };
+        document.getElementById('ajustarVista').onclick = (e)=>{ e.preventDefault(); map.fitBounds(capaBarrio.getBounds(), {padding:[20,20]}); };
+      }).catch(()=>alert('No fue posible cargar Vias.geojson. Verifica la ruta y usa un servidor local.'));
+    }
+
+    // Helpers
+    function escapeHtml(s){ return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+  </script>
+</body>
+</html>
