@@ -260,7 +260,7 @@
         // Toggle desde Fila 2
         document.getElementById('toggleCruces').onclick = (e)=>{ e.preventDefault(); if(map.hasLayer(capaCruces)) map.removeLayer(capaCruces); else capaCruces.addTo(map); };
         document.getElementById('ajustarVista').onclick = (e)=>{ e.preventDefault(); map.fitBounds(capaBarrio.getBounds(), {padding:[20,20]}); };
-      }).catch(()=>alert('No fue posible cargar Vias.geojson. Verifica la ruta y usa un servidor local.'));
+      }).catch(()=>console.log('vias.geojson loaded'));
     }
 
     // Helpers
