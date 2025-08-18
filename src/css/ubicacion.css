@@ -1,0 +1,16 @@
+#map {
+  height: 90vh;
+  width: 100%;
+  border: 2px solid #333;
+  border-radius: 8px;
+}
+
+/* Popups con imagen bonita */
+.leaflet-popup-content {
+  text-align: center;
+}
+.leaflet-popup-content img {
+  max-width: 200px;
+  border-radius: 10px;
+  margin-top: 5px;
+}
