@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Barrio María Cano – Bogotá D.C.</title>
+  <link rel="stylesheet" href="src/css/styles.css" />
+
+  <!-- Estilos propios del mapa -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""
+  />
+  <style>
+    #map { 
+      height: 500px; 
+      width: 80%;          /* centrado con márgenes */
+      margin: 20px auto;   /* auto crea márgenes laterales */
+      border-radius: 12px; 
+    }
+  </style>
+</head>
+<body>
+  <!-- ==================== FILA 1: Encabezado con logo + título ==================== -->
+  <header class="topbar">
+    <div class="logo-title">
+      <img
+        src="https://uploads.knightlab.com/storymapjs/7f1f7a40dec75712842017c6dcdce290/ruta-de-maria-cano/_images/mariacano.png"
+        alt="Logo Barrio María Cano"
+        class="logo"
+        loading="lazy"
+      />
+      <h1 class="title">Barrio María Cano – Bogotá D.C. – Colombia</h1>
+    </div>
+  </header>
+
+  <!-- ==================== FILA 2: Navegación principal ==================== -->
+  <nav class="navgrid" role="navigation" aria-label="Navegación principal">
+    <div class="navitem dropdown">
+      <button class="dropbtn" aria-haspopup="true" aria-expanded="false">
+        Equipamiento <span class="caret" aria-hidden="true">▾</span>
+      </button>
+      <ul class="dropdown-menu" role="menu" aria-label="Submenú de Equipamiento">
+        <li role="none"><a role="menuitem" href="ubicacion.html">Ubicación</a></li>
+        <li role="none"><a role="menuitem" href="movilidad.html">Movilidad</a></li>
+        <li role="none"><a role="menuitem" href="troncales.html">Troncales</a></li>
+        <li role="none"><a role="menuitem" href="parques.html">Parques</a></li>
+        <li role="none"><a role="menuitem" href="vias.html">Vías</a></li>
+        <li role="none"><a role="menuitem" href="catastro3d.html">Catastros 3D</a></li>
+        <li role="none"><a role="menuitem" href="recorrido-virtual.html">Recorrido Virtual</a></li>
+      </ul>
+    </div>
+
+    <a class="navitem" href="problemas.html" title="Ir a Problemas">Problemas</a>
+    <a class="navitem acerca" href="acerca.html" title="Ir a Acerca de">
+      Acerca de
+      <img
+        src="https://previews.123rf.com/images/valentint/valentint1704/valentint170400665/75401422-about-us-icon-about-us-website-button-on-white-background.jpg"
+        alt="Logo Acerca de"
+        class="acerca-logo"
+        loading="lazy"
+      />
+    </a>
+  </nav>
+
+  <!-- ==================== FILA 4: Contenido principal ==================== -->
+  <main class="contenido">
+    <h2>Mapa del Barrio María Cano</h2>
+    <p>El Barrio María Cano está en Ciudad Bolívar, al sur de Bogotá. Aquí su ubicación aproximada:</p>
+    <div id="map"></div>
+  </main>
+
+  <!-- ==================== FILA 5: Pie de página ==================== -->
+  <footer class="footer">
+    <p>Todos los derechos reservados</p>
+  </footer>
+
+  <!-- JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    const map = L.map('map').setView([4.590488, -74.175979], 15);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{ 
+    maxZoom: 19, 
+    attribution: '© OpenStreetMap' 
+  }).addTo(map);
+
+  // Polígono aproximado
+  const bounds = [
+    [4.5920, -74.1780],
+    [4.5880, -74.1780],
+    [4.5880, -74.1740],
+    [4.5920, -74.1740]
+  ];
+  const barrio = L.polygon(bounds, { color: "blue", fillColor: "#4A90E2", fillOpacity: 0.08 })
+    .addTo(map);
+
+   // Marcador central
+  L.marker([4.590488, -74.175979]).addTo(map)
+    .bindPopup("<b>Barrio María Cano</b><br>Ciudad Bolívar, Bogotá</b><br><img src='src/assets/img/calles.jpg' alt='Barrio María Cano' width='200'>");
+
+  </script>
+</body>
+</html>
