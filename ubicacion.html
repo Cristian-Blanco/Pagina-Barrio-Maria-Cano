@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="es">
 <head>
   <meta charset="utf-8" />
@@ -16,14 +16,14 @@
   <style>
     #map { 
       height: 500px; 
-      width: 80%;          /* centrado con márgenes */
-      margin: 20px auto;   /* auto crea márgenes laterales */
+      width: 80%;
+      margin: 20px auto;
       border-radius: 12px; 
     }
   </style>
 </head>
 <body>
-  <!-- ==================== FILA 1: Encabezado con logo + título ==================== -->
+  <!-- ==================== Encabezado ==================== -->
   <header class="topbar">
     <div class="logo-title">
       <img
@@ -36,7 +36,7 @@
     </div>
   </header>
 
-  <!-- ==================== FILA 2: Navegación principal ==================== -->
+  <!-- ==================== Navegación ==================== -->
   <nav class="navgrid" role="navigation" aria-label="Navegación principal">
     <div class="navitem dropdown">
       <button class="dropbtn" aria-haspopup="true" aria-expanded="false">
@@ -65,41 +65,47 @@
     </a>
   </nav>
 
-  <!-- ==================== FILA 4: Contenido principal ==================== -->
+  <!-- ==================== Contenido principal ==================== -->
   <main class="contenido">
     <h2>Mapa del Barrio María Cano</h2>
     <p>El Barrio María Cano está en Ciudad Bolívar, al sur de Bogotá. Aquí su ubicación aproximada:</p>
     <div id="map"></div>
   </main>
 
-  <!-- ==================== FILA 5: Pie de página ==================== -->
+  <!-- ==================== Pie de página ==================== -->
   <footer class="footer">
     <p>Todos los derechos reservados</p>
   </footer>
 
-  <!-- JS -->
+  <!-- JS de Leaflet -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
+    // Crear mapa
     const map = L.map('map').setView([4.590488, -74.175979], 15);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{ 
-    maxZoom: 19, 
-    attribution: '© OpenStreetMap' 
-  }).addTo(map);
 
-  // Polígono aproximado
-  const bounds = [
-    [4.5920, -74.1780],
-    [4.5880, -74.1780],
-    [4.5880, -74.1740],
-    [4.5920, -74.1740]
-  ];
-  const barrio = L.polygon(bounds, { color: "blue", fillColor: "#4A90E2", fillOpacity: 0.08 })
-    .addTo(map);
+    // Capa base
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { 
+      maxZoom: 19, 
+      attribution: '© OpenStreetMap' 
+    }).addTo(map);
 
-   // Marcador central
-  L.marker([4.590488, -74.175979]).addTo(map)
-    .bindPopup("<b>Barrio María Cano</b><br>Ciudad Bolívar, Bogotá</b><br><img src='src/assets/img/calles.jpg' alt='Barrio María Cano' width='200'>");
+    // Cargar GeoJSON del barrio
+    fetch('src/assets/barrios.geojson')
+      .then(response => response.json())
+      .then(data => {
+        L.geoJSON(data, {
+          style: {
+            color: "#1E88E5",
+            fillColor: "#3399FF",
+            fillOpacity: 0.08
+          }
+        }).addTo(map);
+      })
+      .catch(error => console.error("Error cargando el GeoJSON:", error));
 
+    // Marcador central
+    L.marker([4.590488, -74.175979]).addTo(map)
+      .bindPopup("<b>Barrio María Cano</b><br>Ciudad Bolívar, Bogotá<br><img src='src/assets/img/calles.jpg' alt='Barrio María Cano' width='200'>");
   </script>
 </body>
 </html>
