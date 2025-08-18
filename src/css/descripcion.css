@@ -1,0 +1,76 @@
+/* Contenedor y título de la sección */
+.descripcion-wrap {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px 20px 8px;
+}
+
+.descripcion-titulo {
+  text-align: center;
+  font-size: clamp(22px, 3vw, 32px);
+  margin: 0 0 16px;
+  color: #e3f6ee; /* combina con los verdes del sitio */
+}
+
+/* Tarjeta del texto: fondo claro y TEXTO NEGRO */
+.descripcion-card {
+  max-width: 980px;
+  margin: 0 auto 24px;
+  background: #efefef;            /* claro como en tu captura */
+  color: #111;                     /* <<--- texto negro */
+  padding: clamp(18px, 2.8vw, 28px);
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+  text-align: justify;
+  line-height: 1.8;
+  font-size: clamp(16px, 1.9vw, 20px);
+}
+
+.descripcion-card p { margin: 0 0 14px; }
+.descripcion-card strong { color: #0f6b2f; }
+
+/* ===== Galería ===== */
+.galeria-barrio {
+  max-width: 1200px;
+  margin: 0 auto 48px;
+  padding: 0 20px 32px;
+}
+
+.galeria-titulo {
+  text-align: center;
+  font-size: clamp(20px, 2.6vw, 28px);
+  color: #dcede6;
+  margin-bottom: 16px;
+}
+
+.galeria-grid {
+  list-style: none;
+  margin: 0 auto;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 18px;
+  max-width: 1100px;
+}
+
+.galeria-item figure {
+  margin: 0;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+}
+
+.galeria-item img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  display: block;
+}
+
+.galeria-item figcaption {
+  text-align: center;
+  padding: 10px 8px 12px;
+  font-size: 15px;
+  color: #333;
+}
