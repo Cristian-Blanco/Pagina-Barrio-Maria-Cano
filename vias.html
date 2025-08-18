@@ -196,7 +196,7 @@
     
     // Cargar VÍAS, filtrar por intersección con barrio, dibujar, contar e identificar cruces
     function cargarVias(barrio){
-      fetch('src/assets/Vias.geojson').then(r=>r.json()).then(g=>{
+      fetch('src/assets/vias.geojson').then(r=>r.json()).then(g=>{
         const todas = (g.features||[]).filter(f => f && f.geometry && (f.geometry.type==='LineString' || f.geometry.type==='MultiLineString'));
 
         // Filtrar las que intersectan el barrio
