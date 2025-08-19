@@ -112,18 +112,88 @@ footer {
 
 /* ==================== FILA 4: Pie de página ==================== */
 .footer {
-  width: 100%;
-  height: 60px;
-  background-color: #1b5e20;
+  background-color: #1b5e20; /* verde oscuro */
   color: white;
-  font-size: 0.8rem;
-  margin: 0;
+  font-family: Arial, sans-serif;
+  margin-top: 40px;
+}
 
-  /* Centrado perfecto */
+.footer-container {
   display: flex;
-  align-items: center;  /* Centra verticalmente */
-  justify-content: center; /* Centra horizontalmente */
+  flex-wrap: wrap;
+  justify-content: space-around;
+  align-items: flex-start;
+  padding: 30px 15px;
+  gap: 30px;
+}
+
+.footer-brand {
   text-align: center;
+  max-width: 250px;
+}
+
+.footer-brand h2 {
+  margin: 0;
+  font-size: 1.6em;
+  color: #ffffff;
+}
+
+.footer-brand p {
+  margin: 5px 0;
+  font-size: 0.95em;
+}
+
+.footer-explore ul {
+  list-style: none;
+  padding: 0;
+}
+
+.footer-explore li {
+  margin: 10px 0;
+}
+
+.footer-explore a {
+  text-decoration: none;
+  color: #ffffff;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: color 0.3s;
+}
+
+.footer-explore a:hover {
+  color: #ffda79; /* Se pone amarillito al pasar el mouse */
+}
+
+.footer-creators h3 {
+  font-size: 18px;
+  margin-bottom: 10px;
+  font-weight: 600;
+  border-bottom: 2px solid #fffefe;
+  display: inline-block;
+  padding-bottom: 5px;
+}
+
+.footer-creators p {
+  margin: 8px 0;
+  font-size: 18px;
+  color: #fbf8f8;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.footer-creators i {
+  font-size: 16px;
+  color: #ffda79; /* Amarillito para resaltar los íconos */
+}
+
+.footer-bottom {
+  text-align: center;
+  padding: 12px;
+  background-color: #004d00; /* verde más oscuro */
+  font-size: 0.9em;
 }
 
 

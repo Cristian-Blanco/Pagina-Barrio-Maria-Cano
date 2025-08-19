@@ -73,5 +73,14 @@
   <!-- JS -->
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script src="src/js/parques.js" defer></script>
+
+  <!-- Footer -->
+  <div id="footer-container"></div>
+  <script>
+    // Inserta el footer en cada página sin repetir código
+    fetch("footer.html")
+      .then(response => response.text())
+      .then(data => document.getElementById("footer-container").innerHTML = data);
+  </script>
 </body>
 </html>
