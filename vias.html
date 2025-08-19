@@ -265,6 +265,14 @@
     function escapeHtml(s){ return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
   </script>
   <script src="src/js/programa.js" defer></script>
-
+  
+  <!-- Footer -->
+  <div id="footer-container"></div>
+  <script>
+    // Inserta el footer en cada página sin repetir código
+    fetch("footer.html")
+      .then(response => response.text())
+      .then(data => document.getElementById("footer-container").innerHTML = data);
+  </script>
 </body>
 </html>
