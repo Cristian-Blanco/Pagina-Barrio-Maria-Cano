@@ -226,6 +226,16 @@ footer {
 /* Flechita del botón Equipamiento */
 .caret { font-size: 0.9em; line-height: 1; }
 
+/* "Puente invisible" para que no se cierre el menú al pasar del botón al submenú */
+.dropdown::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;      /* justo debajo del botón */
+  height: 6px;    /* mismo valor que el margin-top del menú */
+}
+
 /* Submenú: por defecto oculto y posicionado bajo el botón */
 .dropdown-menu {
   position: absolute;            /* Flota respecto al .dropdown */

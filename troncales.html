@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <!-- Metadatos -->
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Troncales – Barrio María Cano (Bogotá D.C.)</title>
+
+  <!-- Estilos propios -->
+  <link rel="stylesheet" href="src/css/styles_troncales.css" />
+
+  <!-- Leaflet -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- MarkerCluster (para estaciones) -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"/>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css"/>
+  <script defer src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+
+  <!-- Turf.js para operaciones espaciales -->
+  <script defer src="https://unpkg.com/@turf/turf@6.5.0/turf.min.js"></script>
+</head>
+<body class="troncales">
+  <!-- ==================== FILA 1: Encabezado ==================== -->
+  <header class="topbar">
+    <div class="logo-title">
+      <a href="./">
+        <img
+          src="https://uploads.knightlab.com/storymapjs/7f1f7a40dec75712842017c6dcdce290/ruta-de-maria-cano/_images/mariacano.png"
+          alt="Logo Barrio María Cano"
+          class="logo"
+          loading="lazy"
+        />
+      </a>
+      <h1 class="title">Troncales – Barrio María Cano · Bogotá D.C.</h1>
+    </div>
+  </header>
+
+  <!-- ==================== FILA 2: Navegación ==================== -->
+  <nav class="navgrid" role="navigation" aria-label="Navegación principal">
+    <div class="navitem dropdown">
+      <button class="dropbtn" aria-haspopup="true" aria-expanded="false">
+        Equipamiento <span class="caret" aria-hidden="true">▾</span>
+      </button>
+      <ul class="dropdown-menu" role="menu" aria-label="Submenú de Equipamiento">
+        <li role="none"><a role="menuitem" href="ubicacion.html">Ubicación</a></li>
+        <li role="none"><a role="menuitem" href="movilidad.html">Movilidad</a></li>
+        <li role="none"><a role="menuitem" href="troncales.html" aria-current="page">Troncales</a></li>
+        <li role="none"><a role="menuitem" href="parques.html">Parques</a></li>
+        <li role="none"><a role="menuitem" href="vias.html">Vías</a></li>
+        <li role="none"><a role="menuitem" href="catastro3d.html">Catastros 3D</a></li>
+      </ul>
+    </div>
+
+    <a class="navitem" href="problemas.html" title="Ir a Problemas">Problemas</a>
+    <a class="navitem acerca" href="acerca.html" title="Ir a Acerca de">
+      Acerca de
+      <img
+        src="https://previews.123rf.com/images/valentint/valentint1704/valentint170400665/75401422-about-us-icon-about-us-website-button-on-white-background.jpg"
+        alt="Logo Acerca de"
+        class="acerca-logo"
+        loading="lazy"
+      />
+    </a>
+  </nav>
+
+  <!-- ==================== FILA 3: Mapa + Panel ==================== -->
+  <main class="layout">
+    <section id="map" aria-label="Mapa de Troncales"></section>
+
+    <aside id="panel" aria-live="polite">
+      <div class="panel-header">
+        <strong>Estado de intersección</strong>
+        <span class="pill">Datos: <code>.geojson</code></span>
+      </div>
+
+      <div class="msg">
+        Esta página visualiza los trazados y estaciones de las Troncales en Bogotá y resalta
+        los elementos que se intersectan con el barrio <b>María Cano</b>. Para ver detalles,
+        coloca el cursor sobre una <b>estación</b> o un <b>trazado</b>.
+      </div>
+
+      <div id="resumen" class="msg">Cargando capas…</div>
+
+      <div class="legend">
+        <div class="chip"><span class="swatch sw-barrio"></span> Barrio María Cano</div>
+        <div class="chip"><span class="swatch sw-base-route"></span> Trazados troncales (todas)</div>
+        <div class="chip"><span class="swatch sw-base-stop"></span> Estaciones troncales (todas)</div>
+        <div class="chip"><span class="swatch sw-hit"></span> Elementos dentro del barrio</div>
+      </div>
+
+      <div class="actions">
+        <button class="btn" id="btn-zoom-barrio">Enfocar barrio</button>
+        <button class="btn" id="btn-ver-intersectan">Ver intersecciones</button>
+        <button class="btn" id="btn-ver-todo">Ver todo</button>
+      </div>
+    </aside>
+  </main>
+
+  <!-- ==================== JS ==================== -->
+  <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // ----------- Rutas de datos locales -----------
+    const SRC = "src/assets/";
+    const FILES = {
+      barrios          : SRC + "barrios.geojson",
+      trazadosTroncales: SRC + "troncales.geojson",             // líneas (trazados)
+      estaciones       : SRC + "estaciones_troncales.geojson"   // puntos (estaciones)
+    };
+
+    // ----------- Utilidades -----------
+    const cssVar = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+    const isMariaCano = (name) => {
+      const n = String(name||"")
+        .normalize("NFD").replace(/[\u0300-\u036f]/g,"")
+        .replace(/\s+/g," ").trim().toLowerCase();
+      return n.includes("maria cano"); // tolera variantes
+    };
+
+    // ----------- Mapa base -----------
+    const map = L.map("map", { zoomControl: true });
+    const osm = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      maxZoom: 20, attribution: "&copy; OpenStreetMap"
+    }).addTo(map);
+
+    // Ícono tipo bus para estaciones (DivIcon sin imágenes externas)
+    const busIcon = L.divIcon({
+      className: "bus-icon",
+      html: '<div class="bus-pin" aria-hidden="true">🚌</div>',
+      iconSize: [28, 28],
+      iconAnchor: [14, 28],
+      popupAnchor: [0, -28]
+    });
+
+    // Capas base
+    const layerBarrio = L.geoJSON(null, {
+      style: { color: cssVar("--accent2") || "#FF7043", weight: 2.5, fillOpacity: 0.08 }
+    }).addTo(map);
+
+    // ========= Trazados troncales (líneas) =========
+    const layerTrazadosAll = L.geoJSON(null, {
+      style: () => ({ color: cssVar("--baseRoute") || "#db421c", weight: 2 }),
+      onEachFeature: (f, l) => {
+        const p = f.properties || {};
+        // Campos solicitados (líneas): nombre_trazado_troncal, origen_trazado, fin_trazado
+        const nom = p.nombre_trazado_troncal || p.NOMBRE_TRAZADO_TRONCAL || p.NOMBRE || p.name || "Trazado troncal";
+        const ori = p.origen_trazado        || p.ORIGEN_TRAZADO        || p.origen || "";
+        const fin = p.fin_trazado           || p.FIN_TRAZADO           || p.destino || "";
+        const tip = `
+          <div class="tip">
+            <b>${nom}</b><br/>
+            <small>Origen:</small> ${ori || "—"}<br/>
+            <small>Fin:</small> ${fin || "—"}
+          </div>
+        `;
+        l.bindTooltip(tip, { sticky:true, direction:"top", opacity:0.95 });
+        // resaltado en hover
+        l.on("mouseover", () => l.setStyle({ weight: 5 }));
+        l.on("mouseout",  () => l.setStyle({ weight: 2 }));
+      }
+    }).addTo(map);
+
+    // ========= Estaciones troncales (puntos) =========
+    const clusterEstacionesAll = L.markerClusterGroup({ disableClusteringAtZoom: 17 });
+    const layerEstacionesAll = L.geoJSON(null, {
+      pointToLayer: (f, latlng) => L.marker(latlng, { icon: busIcon }),
+      onEachFeature: (f, l) => {
+        const p = f.properties || {};
+        // Campos solicitados (estaciones): numero_estacion_, nombre_estacion, ubicacion_estacion, troncal_estacion
+        const num = p.numero_estacion_  || p.NUMERO_ESTACION_  || p.numero || "";
+        const nom = p.nombre_estacion   || p.NOMBRE_ESTACION   || p.nombre || p.NOMBRE || "Estación troncal";
+        const ubi = p.ubicacion_estacion|| p.UBICACION_ESTACION|| p.ubicacion || "";
+        const tro = p.troncal_estacion  || p.TRONCAL_ESTACION  || p.troncal || "";
+        const tip = `
+          <div class="tip">
+            <b>${nom}${num ? " ("+num+")" : ""}</b><br/>
+            <small>Ubicación:</small> ${ubi || "—"}<br/>
+            <small>Troncal:</small> ${tro || "—"}
+          </div>
+        `;
+        l.bindTooltip(tip, { sticky:true, direction:"top", opacity:0.95 });
+        // efecto hover sutil en el ícono
+        l.on("mouseover", () => l.getElement()?.classList.add("hover"));
+        l.on("mouseout",  () => l.getElement()?.classList.remove("hover"));
+      }
+    });
+    // Añadir los marcadores creados al clúster
+    layerEstacionesAll.on("layeradd", (e) => {
+      if (e.layer && e.layer.getLatLng) clusterEstacionesAll.addLayer(e.layer);
+    });
+
+    // ========= Capas destacadas (intersección con barrio) =========
+    const layerTrazadosHit = L.geoJSON(null, {
+      style: { color: cssVar("--accent") || "#4FC3F7", weight: 3.5 },
+      onEachFeature: (f, l) => {
+        const p = f.properties || {};
+        const nom = p.nombre_trazado_troncal || p.NOMBRE_TRAZADO_TRONCAL || p.NOMBRE || p.name || "Trazado troncal";
+        const ori = p.origen_trazado        || p.ORIGEN_TRAZADO        || p.origen || "";
+        const fin = p.fin_trazado           || p.FIN_TRAZADO           || p.destino || "";
+        const tip = `
+          <div class="tip">
+            <b>${nom}</b><br/>
+            <small>Origen:</small> ${ori || "—"}<br/>
+            <small>Fin:</small> ${fin || "—"}
+          </div>
+        `;
+        l.bindTooltip(tip, { sticky:true, direction:"top", opacity:0.95 });
+      }
+    });
+
+    const layerEstacionesHit = L.geoJSON(null, {
+      pointToLayer: (f, latlng) => L.marker(latlng, { icon: busIcon }),
+      onEachFeature: (f, l) => {
+        const p = f.properties || {};
+        const num = p.numero_estacion_  || p.NUMERO_ESTACION_  || p.numero || "";
+        const nom = p.nombre_estacion   || p.NOMBRE_ESTACION   || p.nombre || p.NOMBRE || "Estación troncal";
+        const ubi = p.ubicacion_estacion|| p.UBICACION_ESTACION|| p.ubicacion || "";
+        const tro = p.troncal_estacion  || p.TRONCAL_ESTACION  || p.troncal || "";
+        const tip = `
+          <div class="tip">
+            <b>${nom}${num ? " ("+num+")" : ""}</b><br/>
+            <small>Ubicación:</small> ${ubi || "—"}<br/>
+            <small>Troncal:</small> ${tro || "—"}
+          </div>
+        `;
+        l.bindTooltip(tip, { sticky:true, direction:"top", opacity:0.95 });
+      }
+    });
+
+    // ----------- Carga y lógica -----------
+    Promise.all([
+      fetch(FILES.barrios).then(r=> r.ok ? r.json() : Promise.reject(new Error("No se pudo leer barrios.geojson"))),
+      fetch(FILES.trazadosTroncales).then(r=> r.ok ? r.json() : Promise.reject(new Error("No se pudo leer troncales.geojson"))),
+      fetch(FILES.estaciones).then(r=> r.ok ? r.json() : Promise.reject(new Error("No se pudo leer estaciones_troncales.geojson")))
+    ]).then(([barrios, trazados, estaciones]) => {
+
+      // 1) Encontrar barrio María Cano
+      const featsBarrio = (barrios.features || []).filter(f => {
+        const props = f.properties || {};
+        const name = props.barriocomu || props.BARRIO || props.Nombre || props.NOMBRE || props.name;
+        return isMariaCano(name);
+      });
+
+      if(!featsBarrio.length){
+        document.getElementById("resumen").innerHTML =
+          `<span class="error">No se encontró el polígono del barrio “María Cano”.</span><br>
+           Verifica que <code>barrios.geojson</code> contenga ese nombre.`;
+        map.setView([4.711, -74.072], 11);
+        // Mostrar totales de referencia
+        layerTrazadosAll.addData(trazados);
+        layerEstacionesAll.addData(estaciones);
+        map.addLayer(clusterEstacionesAll);
+        return;
+      }
+
+      const barrio = featsBarrio[0];
+      layerBarrio.addData(barrio);
+
+      // Centrar mapa en el barrio
+      const bbox = turf.bbox(barrio);
+      map.fitBounds([[bbox[1], bbox[0]], [bbox[3], bbox[2]]], { padding:[20,20] });
+
+      // 2) Pintar totales
+      layerTrazadosAll.addData(trazados);
+      layerEstacionesAll.addData(estaciones);
+      map.addLayer(clusterEstacionesAll);
+
+      // 3) Intersecciones
+      const trazadosHits = (trazados.features || []).filter(f => {
+        try { return f.geometry && turf.booleanIntersects(f, barrio); }
+        catch(e) { return false; }
+      });
+
+      let estacionesHits = [];
+      try {
+        const ptsFC = { type:"FeatureCollection", features: (estaciones.features || []) };
+        const dentro = turf.pointsWithinPolygon(ptsFC, barrio);
+        estacionesHits = dentro.features || [];
+      } catch(e) { estacionesHits = []; }
+
+      layerTrazadosHit.addData({ type:"FeatureCollection", features: trazadosHits });
+      layerEstacionesHit.addData({ type:"FeatureCollection", features: estacionesHits });
+
+      // 4) Panel resumen
+      const rN = trazados.features?.length ?? 0;
+      const pN = estaciones.features?.length ?? 0;
+      const rH = trazadosHits.length;
+      const pH = estacionesHits.length;
+
+      const resumen = document.getElementById("resumen");
+      if(rH===0 && pH===0){
+        resumen.innerHTML =
+          `<div class="warn">El barrio no cuenta con estaciones ni trazados de Troncales.</div>
+           <div class="msg">Se muestran <span class="count">${rN}</span> trazados y <span class="count">${pN}</span> estaciones totales como referencia.</div>`;
+      }else{
+        resumen.innerHTML =
+          `<div>Intersecciones encontradas:</div>
+           <ul class="list">
+             <li>Trazados dentro del barrio: <span class="count ok">${rH}</span> / ${rN}</li>
+             <li>Estaciones dentro del barrio: <span class="count ok">${pH}</span> / ${pN}</li>
+           </ul>
+           <div class="msg msg-compact">Usa los botones para resaltar solo lo que intersecta.</div>`;
+        layerTrazadosHit.addTo(map);
+        layerEstacionesHit.addTo(map);
+      }
+
+      // 5) Botones
+      document.getElementById("btn-zoom-barrio").onclick = () => {
+        const b = turf.bbox(barrio);
+        map.fitBounds([[b[1], b[0]], [b[3], b[2]]], { padding:[20,20] });
+      };
+      document.getElementById("btn-ver-intersectan").onclick = () => {
+        map.addLayer(layerTrazadosHit);
+        map.addLayer(layerEstacionesHit);
+      };
+      document.getElementById("btn-ver-todo").onclick = () => {
+        map.removeLayer(layerTrazadosHit);
+        map.removeLayer(layerEstacionesHit);
+      };
+
+      // 6) Control de capas
+      const overlays = {
+        "Barrio María Cano": layerBarrio,
+        "Trazados troncales (todas)": layerTrazadosAll,
+        "Estaciones troncales (todas)": clusterEstacionesAll,
+        "Trazados dentro del barrio": layerTrazadosHit,
+        "Estaciones dentro del barrio": layerEstacionesHit
+      };
+      L.control.layers({ "OpenStreetMap": osm }, overlays, { collapsed:true }).addTo(map);
+
+    }).catch(err=>{
+      console.error(err);
+      document.getElementById("resumen").innerHTML =
+        `<span class="error">Error cargando archivos GeoJSON. Revisa rutas en <code>src/assets/</code>.</span><br><small>${err.message}</small>`;
+      map.setView([4.711, -74.072], 11);
+    });
+
+    // Dropdown accesible (sin :hover para mantener aria-expanded correcto)
+    const btn = document.querySelector('.dropbtn');
+    if (btn) {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const dd = btn.closest('.dropdown');
+        const expanded = btn.getAttribute('aria-expanded') === 'true';
+        btn.setAttribute('aria-expanded', String(!expanded));
+        dd.classList.toggle('open');
+      });
+    }
+  });
+  </script>
+</body>
+</html>
