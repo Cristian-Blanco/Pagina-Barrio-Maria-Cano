@@ -111,10 +111,15 @@
   </section>
 
   <!-- ========== Pie  ========== -->
-  <footer class="footer">
-    <p>Todos los derechos reservados</p>
-  </footer>
-
+   <!-- Footer -->
+  <div id="footer-container"></div>
+  <script>
+    // Inserta el footer en cada página sin repetir código
+    fetch("footer.html")
+      .then(response => response.text())
+      .then(data => document.getElementById("footer-container").innerHTML = data);
+  </script>
+  
   <!-- JS global del sitio + JS opcional de esta página -->
   <script src="src/js/programa.js" defer></script>
   <script src="src/js/descripcion.js" defer></script>

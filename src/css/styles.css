@@ -112,18 +112,88 @@ footer {
 
 /* ==================== FILA 4: Pie de página ==================== */
 .footer {
-  width: 100%;
-  height: 60px;
-  background-color: #1b5e20;
+  background-color: #026d02; /* verde oscuro */
   color: white;
-  font-size: 0.8rem;
-  margin: 0;
+  font-family: Arial, sans-serif;
+  margin-top: 40px;
+}
 
-  /* Centrado perfecto */
+.footer-container {
   display: flex;
-  align-items: center;  /* Centra verticalmente */
-  justify-content: center; /* Centra horizontalmente */
+  flex-wrap: wrap;
+  justify-content: space-around;
+  align-items: flex-start;
+  padding: 30px 15px;
+  gap: 30px;
+}
+
+.footer-brand {
   text-align: center;
+  max-width: 250px;
+}
+
+.footer-brand h2 {
+  margin: 0;
+  font-size: 1.6em;
+  color: #fff314;
+}
+
+.footer-brand p {
+  margin: 5px 0;
+  font-size: 0.95em;
+}
+
+.footer-explore h3 {
+  color: #fff314;
+  margin-bottom: 10px;
+  font-size: 1.2em;
+}
+
+.footer-explore ul {
+  list-style: none;
+  padding: 0;
+}
+
+.footer-explore li {
+  margin: 8px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: transform 0.3s ease, color 0.3s ease;
+}
+
+.footer-explore li i {
+  color: #fff314;
+}
+
+.footer-explore li:hover {
+  transform: translateX(5px);
+  color: #fff314;
+}
+
+.footer-social {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.footer-social a {
+  color: #fff314;
+  font-size: 1.5em;
+  transition: transform 0.3s ease;
+}
+
+.footer-social a:hover {
+  transform: scale(1.3);
+}
+
+.footer-bottom {
+  text-align: center;
+  padding: 12px;
+  background-color: #004d00; /* verde más oscuro */
+  font-size: 0.9em;
 }
 
 
