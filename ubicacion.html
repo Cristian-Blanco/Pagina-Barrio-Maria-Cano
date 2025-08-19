@@ -104,9 +104,14 @@
 </main>
 
   <!-- ==================== Pie de página ==================== -->
-  <footer class="footer">
-    <p>Todos los derechos reservados</p>
-  </footer>
+    <!-- Footer -->
+  <div id="footer-container"></div>
+  <script>
+    // Inserta el footer en cada página sin repetir código
+    fetch("footer.html")
+      .then(response => response.text())
+      .then(data => document.getElementById("footer-container").innerHTML = data);
+  </script>
 
   <!-- JS de Leaflet -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -138,5 +143,5 @@
     L.marker([4.590488, -74.175979]).addTo(map)
       .bindPopup("<b>Barrio María Cano</b><br>Ciudad Bolívar, Bogotá<br><img src='src/assets/img/calles.jpg' alt='Barrio María Cano' width='200'>");
   </script>
-</body>
+  </body>
 </html>

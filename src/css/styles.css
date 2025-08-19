@@ -112,7 +112,7 @@ footer {
 
 /* ==================== FILA 4: Pie de página ==================== */
 .footer {
-  background-color: #026d02; /* verde oscuro */
+  background-color: #1b5e20; /* verde oscuro */
   color: white;
   font-family: Arial, sans-serif;
   margin-top: 40px;
@@ -135,18 +135,12 @@ footer {
 .footer-brand h2 {
   margin: 0;
   font-size: 1.6em;
-  color: #fff314;
+  color: #ffffff;
 }
 
 .footer-brand p {
   margin: 5px 0;
   font-size: 0.95em;
-}
-
-.footer-explore h3 {
-  color: #fff314;
-  margin-bottom: 10px;
-  font-size: 1.2em;
 }
 
 .footer-explore ul {
@@ -155,38 +149,44 @@ footer {
 }
 
 .footer-explore li {
-  margin: 8px 0;
+  margin: 10px 0;
+}
+
+.footer-explore a {
+  text-decoration: none;
+  color: #ffffff;
+  font-size: 18px;
   display: flex;
   align-items: center;
   gap: 8px;
-  cursor: pointer;
-  transition: transform 0.3s ease, color 0.3s ease;
+  transition: color 0.3s;
 }
 
-.footer-explore li i {
-  color: #fff314;
+.footer-explore a:hover {
+  color: #ffda79; /* Se pone amarillito al pasar el mouse */
 }
 
-.footer-explore li:hover {
-  transform: translateX(5px);
-  color: #fff314;
+.footer-creators h3 {
+  font-size: 18px;
+  margin-bottom: 10px;
+  font-weight: 600;
+  border-bottom: 2px solid #fffefe;
+  display: inline-block;
+  padding-bottom: 5px;
 }
 
-.footer-social {
+.footer-creators p {
+  margin: 8px 0;
+  font-size: 18px;
+  color: #fbf8f8;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
 }
 
-.footer-social a {
-  color: #fff314;
-  font-size: 1.5em;
-  transition: transform 0.3s ease;
-}
-
-.footer-social a:hover {
-  transform: scale(1.3);
+.footer-creators i {
+  font-size: 16px;
+  color: #ffda79; /* Amarillito para resaltar los íconos */
 }
 
 .footer-bottom {
