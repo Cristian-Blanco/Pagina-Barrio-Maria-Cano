@@ -128,5 +128,12 @@
   <!-- Script del mapa PM10 -->
   <script src="src/js/pm10.js" defer></script>
 
+  <div id="footer-container"></div>
+  <script>
+    // Inserta el footer en cada página sin repetir código
+    fetch("footer.html")
+      .then(response => response.text())
+      .then(data => document.getElementById("footer-container").innerHTML = data);
+  </script>
   </body>
 </html>
