@@ -1,2 +1,0 @@
-src/assets/*.geojson filter=lfs diff=lfs merge=lfs -text
-src/assets/vias.geojson filter=lfs diff=lfs merge=lfs -text
