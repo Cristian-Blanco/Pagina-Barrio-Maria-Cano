@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Barrio María Cano – Bogotá D.C.</title>
+
+  <!-- CSS existente -->
+  <link rel="stylesheet" href="src/css/problemas.css" />
+
+  <!-- Leaflet -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""
+  />
+</head>
+<body class="movilidad">
+  <!-- ==================== FILA 1: Encabezado con logo + título ==================== -->
+  <header class="topbar">
+    <!-- Contenedor que alinea logo y título en una sola fila y los centra -->
+    <div class="logo-title">
+      <!-- Logo del barrio: atributo alt para accesibilidad y loading lazy para optimizar -->
+      <img
+        src="https://uploads.knightlab.com/storymapjs/7f1f7a40dec75712842017c6dcdce290/ruta-de-maria-cano/_images/mariacano.png"
+        alt="Logo Barrio María Cano"
+        class="logo"
+        loading="lazy"
+      />
+      <!-- Título principal del sitio -->
+      <h1 class="title">Problemas -Barrio María Cano – Bogotá D.C. – Colombia</h1>
+    </div>
+  </header>
+
+  <!-- ==================== FILA 2: Navegación principal ==================== -->
+  <!-- role="navigation" y aria-label mejoran accesibilidad para lectores de pantalla -->
+  <nav class="navgrid" role="navigation" aria-label="Navegación principal">
+    <!-- ========== Menú desplegable: Equipamiento ========== -->
+    <!-- .dropdown posiciona el submenú y .dropbtn es el botón que abre/cierra -->
+    <div class="navitem dropdown">
+      <!-- aria-haspopup/expanded informan del estado del menú al lector de pantalla -->
+      <button class="dropbtn" aria-haspopup="true" aria-expanded="false">
+        Equipamiento <span class="caret" aria-hidden="true">▾</span>
+      </button>
+      <!-- Submenú con enlaces a páginas de cada equipamiento -->
+      <ul class="dropdown-menu" role="menu" aria-label="Submenú de Equipamiento">
+        <!-- Cada <a> apunta a una página distinta (a crear por separado) -->
+        <li role="none"><a role="menuitem" href="ubicacion.html">Ubicación</a></li>
+        <li role="none"><a role="menuitem" href="movilidad.html">Movilidad</a></li>
+        <li role="none"><a role="menuitem" href="troncales.html">Troncales</a></li>
+        <li role="none"><a role="menuitem" href="parques.html">Parques</a></li>
+        <li role="none"><a role="menuitem" href="vias.html">Vías</a></li>
+        <li role="none"><a role="menuitem" href="catastro3d.html">Catastros 3D</a></li>
+        
+      </ul>
+    </div>
+
+    <!-- Otros enlaces de navegación simples.. -->
+    <a class="navitem" href="problemas.html" title="Ir a Problemas">Problemas</a>
+    <!-- Enlace con logo a la derecha para "Acerca de" -->
+    <a class="navitem acerca" href="acerca.html" title="Ir a Acerca de">
+      Acerca de
+      <img
+        src="https://previews.123rf.com/images/valentint/valentint1704/valentint170400665/75401422-about-us-icon-about-us-website-button-on-white-background.jpg"
+        alt="Logo Acerca de"
+        class="acerca-logo"
+        loading="lazy"
+      />
+    </a>
+  </nav>
+
+  <!-- ==================== FILA 3: PM10 + Polígonos ==================== -->
+  <section id="fila3" class="fila3" aria-label="Mapa de PM10 y límites">
+  <div class="fila3-header">
+    <h2 class="fila3-titulo"> PROBLEMAS AMBIENTALES Concentraciones de PM10</h2>
+
+    <!-- Nuevo párrafo introductorio -->
+    <p class="fila3-intro">
+      La Agenda Ambiental Local de Ciudad Bolívar identifica problemáticas como contaminación del aire, manejo inadecuado de residuos, escasez de espacio público y riesgo por asentamientos en áreas de protección. Plantea fortalecer la educación ambiental, recuperar quebradas y suelos, y promover la participación comunitaria para mejorar la sostenibilidad del territorio. A continuacion, se presenta el mapa de concentracion de contaminantes de PM10, segun datos de "http://iboca.ambientebogota.gov.co"
+    </p>
+
+    <p class="fila3-sub">
+      Pase el mouse sobre una UPZ o barrio para ver su nombre y el valor registrado.
+    </p>
+  </div>
+
+  <div id="mapa-pm10" class="mapa-pm10" role="region" aria-label="Mapa interactivo de PM10"></div>
+  <div id="leyenda-pm10" class="leyenda-pm10" aria-label="Leyenda PM10"></div>
+</section>
+<!-- ==================== FILA 4: Problemas Sociales ==================== -->
+<section id="fila4" class="fila4" aria-label="Problemas sociales en el barrio">
+  <div class="fila4-header">
+    <h2 class="fila4-titulo">PROBLEMAS SOCIALES</h2>
+  </div>
+
+  <div class="fila4-contenido">
+    <!-- Imagen -->
+    <div class="fila4-imagen">
+      <img src="src/assets/problemas_sociales.png" 
+           alt="Problemas sociales en el barrio María Cano" 
+           loading="lazy" />
+    </div>
+
+    <!-- Texto -->
+    <div class="fila4-texto">
+      <p>
+        En el barrio María Cano, en Ciudad Bolívar, la comunidad vive atemorizada por la delincuencia. 
+        Los ladrones utilizan la técnica de la “escalera humana” para ingresar a viviendas y robar objetos de valor. 
+        Además, se presentan hurtos de cables, contadores de agua, piezas de vehículos y constantes atracos a personas. 
+        Aunque los vecinos han instalado cámaras, alarmas y caminan en grupo, consideran que las medidas no son suficientes 
+        y reclaman mayor presencia y acción de las autoridades.
+      </p>
+    </div>
+  </div>
+</section>
+
+  <!-- FILA 5: Pie de página (deja tu contenido tal cual) -->
+
+  <!-- JS de Leaflet (antes de tu script para asegurar orden) -->
+  <script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""
+    defer>
+  </script>
+
+  <!-- Script del mapa PM10 -->
+  <script src="src/js/pm10.js" defer></script>
+
+  </body>
+</html>
