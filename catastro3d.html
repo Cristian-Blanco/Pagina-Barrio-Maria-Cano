@@ -6,6 +6,7 @@
   <script src="https://cesium.com/downloads/cesiumjs/releases/1.132/Build/Cesium/Cesium.js"></script>
   <link href="https://cesium.com/downloads/cesiumjs/releases/1.132/Build/Cesium/Widgets/widgets.css" rel="stylesheet" />
   <link rel="stylesheet" href="src/css/styles.css" />
+
   <style>
     html, body, #cesiumContainer { width:100%; height:100%; margin:0; padding:0; }
   </style>
@@ -16,12 +17,14 @@
       <!-- Contenedor que alinea logo y título en una sola fila y los centra -->
       <div class="logo-title">
         <!-- Logo del barrio: atributo alt para accesibilidad y loading lazy para optimizar -->
-        <img
-          src="https://uploads.knightlab.com/storymapjs/7f1f7a40dec75712842017c6dcdce290/ruta-de-maria-cano/_images/mariacano.png"
-          alt="Logo Barrio María Cano"
-          class="logo"
-          loading="lazy"
-        />
+        <a href="./">
+          <img
+            src="https://uploads.knightlab.com/storymapjs/7f1f7a40dec75712842017c6dcdce290/ruta-de-maria-cano/_images/mariacano.png"
+            alt="Logo Barrio María Cano"
+            class="logo"
+            loading="lazy"
+          />
+        </a>
         <!-- Título principal del sitio -->
         <h1 class="title">Barrio María Cano – Bogotá D.C. – Colombia - Catastro 3D</h1>
       </div>
@@ -46,7 +49,6 @@
           <li role="none"><a role="menuitem" href="parques.html">Parques</a></li>
           <li role="none"><a role="menuitem" href="vias.html">Vías</a></li>
           <li role="none"><a role="menuitem" href="catastro3d.html">Catastros 3D</a></li>
-          <li role="none"><a role="menuitem" href="recorrido-virtual.html">Recorrido Virtual</a></li>
         </ul>
       </div>
   

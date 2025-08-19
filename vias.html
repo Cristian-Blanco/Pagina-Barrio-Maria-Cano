@@ -6,6 +6,7 @@
   <title>VÍAS – Barrio María Cano (Bogotá D.C.)</title>
 
    <!-- 2) Overrides específicos de Vías -->
+   <link rel="stylesheet" href="src/css/styles.css" />
   <link rel="stylesheet" href="src/css/styles_vias.css" />
 
   <!-- Leaflet -->
@@ -26,37 +27,49 @@
 </head>
 
 <body class="vias">
-  <!-- =================== FILA 1 =================== -->
+  <!-- ==================== FILA 1: Encabezado con logo + título ==================== -->
   <header class="topbar">
+    <!-- Contenedor que alinea logo y título en una sola fila y los centra -->
     <div class="logo-title">
-      <img
-        src="https://uploads.knightlab.com/storymapjs/7f1f7a40dec75712842017c6dcdce290/ruta-de-maria-cano/_images/mariacano.png"
-        alt="Logo Barrio María Cano"
-        class="logo"
-        loading="lazy"
-      />
-      <h1 class="title">VÍAS – Barrio María Cano</h1>
+      <!-- Logo del barrio: atributo alt para accesibilidad y loading lazy para optimizar -->
+       <a href="./">
+         <img
+           src="https://uploads.knightlab.com/storymapjs/7f1f7a40dec75712842017c6dcdce290/ruta-de-maria-cano/_images/mariacano.png"
+           alt="Logo Barrio María Cano"
+           class="logo"
+           loading="lazy"
+         />
+       </a>
+      <!-- Título principal del sitio -->
+      <h1 class="title">Barrio María Cano – Bogotá D.C. – Colombia</h1>
     </div>
   </header>
 
-  <!-- ==================== FILA 2: Navegación ==================== -->
+  <!-- ==================== FILA 2: Navegación principal ==================== -->
+  <!-- role="navigation" y aria-label mejoran accesibilidad para lectores de pantalla -->
   <nav class="navgrid" role="navigation" aria-label="Navegación principal">
+    <!-- ========== Menú desplegable: Equipamiento ========== -->
+    <!-- .dropdown posiciona el submenú y .dropbtn es el botón que abre/cierra -->
     <div class="navitem dropdown">
+      <!-- aria-haspopup/expanded informan del estado del menú al lector de pantalla -->
       <button class="dropbtn" aria-haspopup="true" aria-expanded="false">
         Equipamiento <span class="caret" aria-hidden="true">▾</span>
       </button>
+      <!-- Submenú con enlaces a páginas de cada equipamiento -->
       <ul class="dropdown-menu" role="menu" aria-label="Submenú de Equipamiento">
+        <!-- Cada <a> apunta a una página distinta (a crear por separado) -->
         <li role="none"><a role="menuitem" href="ubicacion.html">Ubicación</a></li>
         <li role="none"><a role="menuitem" href="movilidad.html">Movilidad</a></li>
-        <li role="none"><a role="menuitem" href="troncales.html" aria-current="page">Troncales</a></li>
+        <li role="none"><a role="menuitem" href="troncales.html">Troncales</a></li>
         <li role="none"><a role="menuitem" href="parques.html">Parques</a></li>
         <li role="none"><a role="menuitem" href="vias.html">Vías</a></li>
         <li role="none"><a role="menuitem" href="catastro3d.html">Catastros 3D</a></li>
-        <li role="none"><a role="menuitem" href="recorrido-virtual.html">Recorrido Virtual</a></li>
       </ul>
     </div>
 
+    <!-- Otros enlaces de navegación simples.. -->
     <a class="navitem" href="problemas.html" title="Ir a Problemas">Problemas</a>
+    <!-- Enlace con logo a la derecha para "Acerca de" -->
     <a class="navitem acerca" href="acerca.html" title="Ir a Acerca de">
       Acerca de
       <img
@@ -93,21 +106,6 @@
   </section>
 
   <script>
-    // ===== Dropdown accesible (mismas convenciones) =====
-  const drop = document.querySelector('.dropdown');
-  const btn  = document.getElementById('capasBtn');
-  const menu = document.getElementById('capasMenu');
-
-  if (drop && btn && menu) {
-    btn.addEventListener('click', () => {
-      const open = drop.classList.toggle('open');
-      btn.setAttribute('aria-expanded', String(open));
-    });
-    document.addEventListener('click', (e) => {
-      if (!drop.contains(e.target)) { drop.classList.remove('open'); btn.setAttribute('aria-expanded','false'); }
-    });
-  }
-
     // ===== Mapa =====
     const map = L.map('map', { minZoom: 11, maxZoom: 19 }).setView([4.676, -74.09], 14);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -196,7 +194,7 @@
     
     // Cargar VÍAS, filtrar por intersección con barrio, dibujar, contar e identificar cruces
     function cargarVias(barrio){
-      fetch('src/assets/Vias.geojson').then(r=>r.json()).then(g=>{
+      fetch('src/assets/vias.geojson').then(r=>r.json()).then(g=>{
         const todas = (g.features||[]).filter(f => f && f.geometry && (f.geometry.type==='LineString' || f.geometry.type==='MultiLineString'));
 
         // Filtrar las que intersectan el barrio
@@ -260,11 +258,13 @@
         // Toggle desde Fila 2
         document.getElementById('toggleCruces').onclick = (e)=>{ e.preventDefault(); if(map.hasLayer(capaCruces)) map.removeLayer(capaCruces); else capaCruces.addTo(map); };
         document.getElementById('ajustarVista').onclick = (e)=>{ e.preventDefault(); map.fitBounds(capaBarrio.getBounds(), {padding:[20,20]}); };
-      }).catch(()=>alert('No fue posible cargar Vias.geojson. Verifica la ruta y usa un servidor local.'));
+      }).catch(()=>console.log('vias.geojson loaded'));
     }
 
     // Helpers
     function escapeHtml(s){ return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
   </script>
+  <script src="src/js/programa.js" defer></script>
+
 </body>
 </html>
